@@ -1,7 +1,7 @@
 # encoding: utf-8
 require "logstash/devutils/rspec/spec_helper"
 require 'avro'
-require 'logstash/codecs/avro'
+require 'logstash/codecs/avro_schema_registry'
 require 'logstash/event'
 
 describe LogStash::Codecs::AvroSchemaRegistry do
@@ -9,8 +9,8 @@ describe LogStash::Codecs::AvroSchemaRegistry do
   let (:test_event) { LogStash::Event.new({"foo" => "hello", "bar" => 10}) }
 
   subject do
-    allow_any_instance_of(LogStash::Codecs::AvroSchemaRegistry).to \
-      receive(:open_and_read).and_return(avro_config['schema_uri'])
+    # allow_any_instance_of(LogStash::Codecs::AvroSchemaRegistry).to \
+      # receive(:open_and_read).and_return(avro_config['schema_uri'])
     next LogStash::Codecs::AvroSchemaRegistry.new(avro_config)
   end
 
