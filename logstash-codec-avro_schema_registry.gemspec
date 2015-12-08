@@ -1,13 +1,13 @@
 Gem::Specification.new do |s|
 
-  s.name            = 'logstash-codec-avro'
-  s.version         = '2.0.2'
+  s.name            = 'logstash-codec-avro_schema_registry'
+  s.version         = '0.9.0'
   s.licenses        = ['Apache License (2.0)']
-  s.summary         = "Encode and decode avro formatted data"
-  s.description     = "Encode and decode avro formatted data"
-  s.authors         = ["Elastic"]
-  s.email           = 'info@elastic.co'
-  s.homepage        = "http://www.elastic.co/guide/en/logstash/current/index.html"
+  s.summary         = "Encode and decode avro formatted data from a Confluent schema registry"
+  s.description     = "Encode and decode avro formatted data from a Confluent schema registry"
+  s.authors         = ["RevPoint Media"]
+  s.email           = 'tech@revpointmedia.com'
+  s.homepage        = "https://github.com/revpoint/logstash-codec-avro_schema_registry"
   s.require_paths   = ["lib"]
 
   # Files
@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency "avro"  #(Apache 2.0 license)
 
+  s.add_runtime_dependency "schema_registry"  #(MIT license)
+
   s.add_development_dependency 'logstash-devutils'
 end
-

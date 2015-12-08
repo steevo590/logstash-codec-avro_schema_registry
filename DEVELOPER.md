@@ -1,44 +1,23 @@
-Logstash Avro Codec
+Logstash Avro Schema Registry Codec
 ===================
 
 How to Install
 --------------
 
 ```
-bin/plugin install logstash-avro-codec
+bin/plugin install logstash-avro_schema_registry-codec
 ```
 
 How to Use
 ----------
 You can use this codec to decode avro messages
-in a Kafka topic input.
+in a Kafka topic input. Each message must be prefixed
+with a 5-byte struct containing a magic byte and
+the schema id.
 
-Here is an example schema for tweets.
+You must pass the endpoint of the schema registry server.
 
-### tweet.avsc
-```
-{
-  "type" : "record",
-  "name" : "twitter_schema",
-  "namespace" : "com.miguno.avro",
-  "fields" : [ {
-    "name" : "username",
-    "type" : "string",
-    "doc" : "Name of the user account on Twitter.com"
-  }, {
-    "name" : "tweet",
-    "type" : "string",
-    "doc" : "The content of the user's Twitter message"
-  }, {
-    "name" : "timestamp",
-    "type" : "long",
-    "doc" : "Unix epoch time in seconds"
-  } ],
-  "doc:" : "A basic schema for storing Twitter messages"
-}
-```
-
-Along with the logstash config for reading in messages of this 
+Along with the logstash config for reading in messages of this
 type using the avro codec with the logstash-input-kafka plugin.
 
 ### logstash.conf
@@ -47,9 +26,9 @@ type using the avro codec with the logstash-input-kafka plugin.
 input {
   kafka {
     topic_id => 'test_topic'
-      codec => avro {
-        schema_uri => 'tweet.avsc'
-      }
+    codec => avro_schema_registry {
+      endpoint => 'http://schemas.example.com'
+    }
   }
 }
 
