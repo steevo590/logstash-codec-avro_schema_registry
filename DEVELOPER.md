@@ -5,7 +5,7 @@ How to Install
 --------------
 
 ```
-bin/plugin install logstash-avro_schema_registry-codec
+bin/plugin install logstash-codec-avro_schema_registry
 ```
 
 How to Use

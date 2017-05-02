@@ -1,8 +1,7 @@
 Gem::Specification.new do |s|
-
-  s.name            = 'logstash-codec-avro_schema_registry'
-  s.version         = '0.9.0'
-  s.licenses        = ['Apache License (2.0)']
+  s.name          = 'logstash-codec-avro_schema_registry'
+  s.version       = '0.9.1'
+  s.licenses      = ['Apache License (2.0)']
   s.summary         = "Encode and decode avro formatted data from a Confluent schema registry"
   s.description     = "Encode and decode avro formatted data from a Confluent schema registry"
   s.authors         = ["RevPoint Media"]
@@ -12,19 +11,16 @@ Gem::Specification.new do |s|
 
   # Files
   s.files = Dir['lib/**/*','spec/**/*','vendor/**/*','*.gemspec','*.md','CONTRIBUTORS','Gemfile','LICENSE','NOTICE.TXT']
-
-  # Tests
+   # Tests
   s.test_files = s.files.grep(%r{^(test|spec|features)/})
 
   # Special flag to let us know this is actually a logstash plugin
   s.metadata = { "logstash_plugin" => "true", "logstash_group" => "codec" }
 
   # Gem dependencies
-  s.add_runtime_dependency "logstash-core", ">= 2.0.0.beta2", "< 3.0.0"
-
+  s.add_runtime_dependency 'logstash-core-plugin-api', "~> 2.0"
+  s.add_runtime_dependency 'logstash-codec-line'
   s.add_runtime_dependency "avro"  #(Apache 2.0 license)
-
   s.add_runtime_dependency "schema_registry"  #(MIT license)
-
   s.add_development_dependency 'logstash-devutils'
 end
