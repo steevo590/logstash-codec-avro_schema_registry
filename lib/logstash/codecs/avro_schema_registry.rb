@@ -54,6 +54,7 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
   config :endpoint, :validate => :string, :required => true
   config :username, :validate => :string, :default => nil
   config :password, :validate => :string, :default => nil
+  config :schema_id, :validate => :number, :default => nil
 
   public
   def register
@@ -88,6 +89,13 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
 
   public
   def encode(event)
-    @logger.error('Encode has not been implemented for this codec')
+    schema = get_schema(@schema_id)
+    dw = Avro::IO::DatumWriter.new(schema)
+    buffer = StringIO.new
+    buffer.write(MAGIC_BYTE.chr)
+    buffer.write([schema_id].pack("I>"))
+    encoder = Avro::IO::BinaryEncoder.new(buffer)
+    dw.write(event.to_hash, encoder)
+    @on_event.call(event, buffer.string.to_java_bytes)
   end
 end
