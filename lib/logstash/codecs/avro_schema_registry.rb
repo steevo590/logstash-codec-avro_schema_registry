@@ -67,6 +67,9 @@ MAGIC_BYTE = 0
 #     ...
 #     codec => avro_schema_registry {
 #       endpoint => "http://schemas.example.com"
+#       subject_name => "my_kafka_subject_name"
+#       schema_path => "/app/my_kafka_subject.avsc"
+#       register_schema => true
 #     }
 #     value_serializer => "org.apache.kafka.common.serialization.ByteArraySerializer"
 #   }
