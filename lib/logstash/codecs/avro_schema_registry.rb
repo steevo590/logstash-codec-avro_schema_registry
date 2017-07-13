@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "avro"
+require "open-uri"
 require "schema_registry"
 require "schema_registry/client"
 require "logstash/codecs/base"
@@ -7,7 +8,6 @@ require "logstash/namespace"
 require "logstash/event"
 require "logstash/timestamp"
 require "logstash/util"
-require "net/http"
 
 MAGIC_BYTE = 0
 
@@ -26,8 +26,6 @@ MAGIC_BYTE = 0
 #
 # When this codec is used on the input, only the ``endpoint`` option is required.
 #
-# Make sure you set ``value_deserializer_class`` on your kafka input config to ``"org.apache.kafka.common.serialization.ByteArraySerializer"``. If your data has a key, make sure to also set ``key_deserializer_class``.
-#
 # ==== Encoding (output)
 #
 # This codec uses the Confluent schema registry to register a schema and
@@ -38,11 +36,9 @@ MAGIC_BYTE = 0
 # - If ``schema_id`` is provided, no other options are required.
 # - Otherwise, ``subject_name`` is required.
 # - If ``schema_version`` is provided, the schema will be looked up in the registry.
-# - Otherwise, a JSON schema is loaded from either ``schema_uri``, ``schema_path``, or ``schema_string``
+# - Otherwise, a JSON schema is loaded from either ``schema_uri``, or ``schema_string``
 # - If ``check_compatibility`` is true, always check compatibility.
 # - If ``register_schema`` is true, register the JSON schema if it does not exist.
-#
-# Make sure you set ``value_serializer`` on your kafka input config to ``"org.apache.kafka.common.serialization.ByteArraySerializer"``.
 #
 # ==== Usage
 # Example usage with Kafka input and output.
@@ -55,8 +51,6 @@ MAGIC_BYTE = 0
 #     codec => avro_schema_registry {
 #       endpoint => "http://schemas.example.com"
 #     }
-#     key_deserializer_class => "org.apache.kafka.common.serialization.ByteArrayDeserializer"
-#     value_deserializer_class => "org.apache.kafka.common.serialization.ByteArrayDeserializer"
 #   }
 # }
 # filter {
@@ -68,10 +62,9 @@ MAGIC_BYTE = 0
 #     codec => avro_schema_registry {
 #       endpoint => "http://schemas.example.com"
 #       subject_name => "my_kafka_subject_name"
-#       schema_path => "/app/my_kafka_subject.avsc"
+#       schema_uri => "/app/my_kafka_subject.avsc"
 #       register_schema => true
 #     }
-#     value_serializer => "org.apache.kafka.common.serialization.ByteArraySerializer"
 #   }
 # }
 # ----------------------------------
@@ -87,7 +80,6 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
   config :subject_name, :validate => :string, :default => nil
   config :subject_version, :validate => :number, :default => nil
   config :schema_uri, :validate => :uri, :default => nil
-  config :schema_path, :validate => :path, :default => nil
   config :schema_string, :validate => :string, :default => nil
   config :check_compatibility, :validate => :boolean, :default => false
   config :register_schema, :validate => :boolean, :default => false
@@ -108,13 +100,11 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
 
   def load_schema_json()
     if @schema_uri
-      Net::HTTP.get(URI.parse(@schema_uri))
-    elsif @schema_path
-      File.open(@schema_path, 'rb') { |file| file.read }
+      open(@schema_uri).read
     elsif @schema_string
       @schema_string
     else
-      @logger.error('you must supply a Avro schema as a URI, path, or a string')
+      @logger.error('you must supply a schema_uri or schema_string in the config')
     end
   end
 
@@ -162,7 +152,7 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
     if data.length < 5
       @logger.error('message is too small to decode')
     else
-      datum = StringIO.new(data)
+      datum = StringIO.new(Base64.strict_decode64(data)) rescue StringIO.new(data)
       magic_byte, schema_id = datum.read(5).unpack("cI>")
       if magic_byte != MAGIC_BYTE
         @logger.error('message does not start with magic byte')
@@ -185,6 +175,6 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
     buffer.write([@write_schema_id].pack("I>"))
     encoder = Avro::IO::BinaryEncoder.new(buffer)
     dw.write(event.to_hash, encoder)
-    @on_event.call(event, buffer.string.to_java_bytes)
+    @on_event.call(event, Base64.strict_encode64(buffer.string))
   end
 end
