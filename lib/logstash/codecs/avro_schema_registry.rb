@@ -8,6 +8,7 @@ require "logstash/namespace"
 require "logstash/event"
 require "logstash/timestamp"
 require "logstash/util"
+require "base64"
 
 MAGIC_BYTE = 0
 
@@ -80,11 +81,12 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
 
   config :schema_id, :validate => :number, :default => nil
   config :subject_name, :validate => :string, :default => nil
-  config :subject_version, :validate => :number, :default => nil
-  config :schema_uri, :validate => :uri, :default => nil
+  config :schema_version, :validate => :number, :default => nil
+  config :schema_uri, :validate => :string, :default => nil
   config :schema_string, :validate => :string, :default => nil
   config :check_compatibility, :validate => :boolean, :default => false
   config :register_schema, :validate => :boolean, :default => false
+  config :binary_encoded, :validate => :boolean, :default => false
 
   public
   def register
@@ -179,6 +181,10 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
     eh = event.to_hash
     eh.delete_if { |key, _| EXCLUDE_ALWAYS.include? key }
     dw.write(eh, encoder)
-    @on_event.call(event, Base64.strict_encode64(buffer.string))
+    if @binary_encoded
+       @on_event.call(event, buffer.string.to_java_bytes)
+    else
+       @on_event.call(event, Base64.strict_encode64(buffer.string))
+    end
   end
 end
