@@ -30,6 +30,9 @@ MAGIC_BYTE = 0
 # - ``username`` - optional.
 # - ``password`` - optional.
 #
+# If the input stream is binary encoded, you should use the ``ByteArrayDeserializer``
+# in the Kafka input config.
+#
 # ==== Encoding (output)
 #
 # This codec uses the Confluent schema registry to register a schema and
@@ -60,6 +63,7 @@ MAGIC_BYTE = 0
 #     codec => avro_schema_registry {
 #       endpoint => "http://schemas.example.com"
 #     }
+#     value_deserializer_class => "org.apache.kafka.common.serialization.ByteArrayDeserializer"
 #   }
 # }
 # filter {

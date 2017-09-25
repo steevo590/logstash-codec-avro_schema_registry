@@ -15,6 +15,9 @@ When this codec is used to decode the input, you may pass the following options:
 - ``username`` - optional.
 - ``password`` - optional.
 
+If the input stream is binary encoded, you should use the ``ByteArrayDeserializer``
+in the Kafka input config.
+
 ## Encoding (output)
 
 This codec uses the Confluent schema registry to register a schema and
@@ -45,6 +48,7 @@ input {
     codec => avro_schema_registry {
       endpoint => "http://schemas.example.com"
     }
+    value_deserializer_class => "org.apache.kafka.common.serialization.ByteArrayDeserializer"
   }
 }
 filter {
