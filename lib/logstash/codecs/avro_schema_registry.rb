@@ -12,34 +12,42 @@ require "base64"
 
 MAGIC_BYTE = 0
 
-# Read serialized Avro records as Logstash events
+# == Logstash Codec - Avro Schema Registry
 #
 # This plugin is used to serialize Logstash events as
 # Avro datums, as well as deserializing Avro datums into
 # Logstash events.
 #
+# Decode/encode Avro records as Logstash events using the
+# associated Avro schema from a Confluent schema registry.
+# (https://github.com/confluentinc/schema-registry)
+#
 #
 # ==== Decoding (input)
 #
-# This codec is for deserializing individual Avro records. It looks up
-# the associated avro schema from a Confluent schema registry.
-# (https://github.com/confluentinc/schema-registry)
-#
-# When this codec is used on the input, only the ``endpoint`` option is required.
+# When this codec is used to decode the input, you may pass the following options:
+# - ``endpoint`` - always required.
+# - ``username`` - optional.
+# - ``password`` - optional.
 #
 # ==== Encoding (output)
 #
 # This codec uses the Confluent schema registry to register a schema and
 # encode the data in Avro using schema_id lookups.
 #
-# You can pass several options:
-# - ``endpoint`` is always required.
-# - If ``schema_id`` is provided, no other options are required.
-# - Otherwise, ``subject_name`` is required.
-# - If ``schema_version`` is provided, the schema will be looked up in the registry.
-# - Otherwise, a JSON schema is loaded from either ``schema_uri``, or ``schema_string``
-# - If ``check_compatibility`` is true, always check compatibility.
-# - If ``register_schema`` is true, register the JSON schema if it does not exist.
+# When this codec is used to encode, you may pass the following options:
+# - ``endpoint`` - always required.
+# - ``username`` - optional.
+# - ``password`` - optional.
+# - ``schema_id`` - when provided, no other options are required.
+# - ``subject_name`` - required when there is no ``schema_id``.
+# - ``schema_version`` - when provided, the schema will be looked up in the registry.
+# - ``schema_uri`` - when provided, JSON schema is loaded from URL or file.
+# - ``schema_string`` - required when there is no ``schema_id``, ``schema_version`` or ``schema_uri``
+# - ``check_compatibility`` - will check schema compatibility before encoding.
+# - ``register_schema`` - will register the JSON schema if it does not exist.
+# - ``binary_encoded`` - will output the encoded event as a ByteArray.
+#   Requires the ``ByteArraySerializer`` to be set in the Kafka output config.
 #
 # ==== Usage
 # Example usage with Kafka input and output.
@@ -69,6 +77,24 @@ MAGIC_BYTE = 0
 #   }
 # }
 # ----------------------------------
+#
+# Binary encoded Kafka output
+#
+# [source,ruby]
+# ----------------------------------
+# output {
+#   kafka {
+#     ...
+#     codec => avro_schema_registry {
+#       endpoint => "http://schemas.example.com"
+#       schema_id => 47
+#       binary_encoded => true
+#     }
+#     value_serializer => "org.apache.kafka.common.serialization.ByteArraySerializer"
+#   }
+# }
+# ----------------------------------
+
 class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
   config_name "avro_schema_registry"
   
