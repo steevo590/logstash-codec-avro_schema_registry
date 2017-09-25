@@ -1,5 +1,7 @@
 # Logstash Codec - Avro Schema Registry
 
+### v1.0.0
+
 This plugin is used to serialize Logstash events as
 Avro datums, as well as deserializing Avro datums into
 Logstash events.
@@ -7,6 +9,12 @@ Logstash events.
 Decode/encode Avro records as Logstash events using the 
 associated Avro schema from a Confluent schema registry.
 (https://github.com/confluentinc/schema-registry)
+
+## Installation
+
+```
+logstash-plugin install logstash-codec-avro_schema_registry
+```
 
 ##  Decoding (input)
 
