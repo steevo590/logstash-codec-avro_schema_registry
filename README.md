@@ -23,6 +23,7 @@ When this codec is used to decode the input, you may pass the following options:
 - ``username`` - optional.
 - ``password`` - optional.
 - ``tag_on_failure`` - tag events with ``_avroparsefailure`` when decode fails
+- ``decorate_events`` - will add avro schema metadata to the event.
 
 If the input stream is binary encoded, you should use the ``ByteArrayDeserializer``
 in the Kafka input config.
