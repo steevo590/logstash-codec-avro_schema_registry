@@ -42,8 +42,7 @@ When this codec is used to encode, you may pass the following options:
 - ``schema_string`` - required when there is no ``schema_id``, ``schema_version`` or ``schema_uri``
 - ``check_compatibility`` - will check schema compatibility before encoding.
 - ``register_schema`` - will register the JSON schema if it does not exist.
-- ``binary_encoded`` - will output the encoded event as a ByteArray. 
-  Requires the ``ByteArraySerializer`` to be set in the Kafka output config.
+- ``binary_encoded`` - will output the encoded event as a ByteArray. Requires the ``ByteArraySerializer`` to be set in the Kafka output config.
 - ``client_certificate`` -  Client TLS certificate for mutual TLS
 - ``client_key`` -  Client TLS key for mutual TLS
 - ``ca_certificate`` -  CA Certificate
