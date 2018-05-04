@@ -1,4 +1,6 @@
 *.gem
+vendor/
+.ruby-version
 Gemfile.lock
 .bundle
 .idea/
