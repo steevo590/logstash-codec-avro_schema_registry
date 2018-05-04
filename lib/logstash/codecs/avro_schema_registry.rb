@@ -118,9 +118,25 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
   config :register_schema, :validate => :boolean, :default => false
   config :binary_encoded, :validate => :boolean, :default => false
 
+  config :client_certificate, :validate => :string, :default => nil
+  config :client_key, :validate => :string, :default => nil
+  config :ca_certificate, :validate => :string, :default => nil
+  config :verify_mode, :validate => :string, :default => 'verify_peer'
+  
   public
   def register
-    @client = SchemaRegistry::Client.new(endpoint, username, password)
+
+    @client = if client_certificate != nil
+      SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(
+        client_certificate: client_certificate,
+        client_key: client_key,
+        ca_certificate: ca_certificate,
+        verify_mode: verify_mode
+      ))
+    else
+      SchemaRegistry::Client.new(endpoint, username, password)
+    end
+
     @schemas = Hash.new
     @write_schema_id = nil
   end
