@@ -44,6 +44,12 @@ When this codec is used to encode, you may pass the following options:
 - ``register_schema`` - will register the JSON schema if it does not exist.
 - ``binary_encoded`` - will output the encoded event as a ByteArray.
   Requires the ``ByteArraySerializer`` to be set in the Kafka output config.
+- ``client_certificate`` -  Client TLS certificate for mutual TLS
+- ``client_key`` -  Client TLS key for mutual TLS
+- ``ca_certificate`` -  CA Certificate
+- ``verify_mode`` -  SSL Verify modes.  Valid options are `verify_none`, `verify_peer`,  `verify_client_once` , and `verify_fail_if_no_peer_cert`.  Default is `verify_peer`
+
+  
 
 ## Usage
 
@@ -87,6 +93,26 @@ output {
       binary_encoded => true
     }
     value_serializer => "org.apache.kafka.common.serialization.ByteArraySerializer"
+  }
+}
+```
+
+### Using signed certificate for registry authentication
+
+```
+output {
+  kafka {
+    ...
+    codec => avro_schema_registry {
+      endpoint => "http://schemas.example.com"
+      schema_id => 47
+      binary_encoded => true
+    }
+    value_serializer => "org.apache.kafka.common.serialization.ByteArraySerializer"
+    client_key          => "./client.key"
+    client_certificate  => "./client.crt"
+    ca_certificate      => "./ca.pem"
+    verify_mode         => "verify_peer"
   }
 }
 ```
