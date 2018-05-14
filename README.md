@@ -1,6 +1,6 @@
 # Logstash Codec - Avro Schema Registry
 
-### v1.0.0
+### v1.1.0
 
 This plugin is used to serialize Logstash events as
 Avro datums, as well as deserializing Avro datums into
@@ -77,21 +77,6 @@ output {
       schema_uri => "/app/my_kafka_subject.avsc"
       register_schema => true
     }
-  }
-}
-```
-
-### Binary encoded Kafka output
-
-```
-output {
-  kafka {
-    ...
-    codec => avro_schema_registry {
-      endpoint => "http://schemas.example.com"
-      schema_id => 47
-      binary_encoded => true
-    }
     value_serializer => "org.apache.kafka.common.serialization.ByteArraySerializer"
   }
 }
@@ -106,13 +91,12 @@ output {
     codec => avro_schema_registry {
       endpoint => "http://schemas.example.com"
       schema_id => 47
-      binary_encoded => true
+      client_key          => "./client.key"
+      client_certificate  => "./client.crt"
+      ca_certificate      => "./ca.pem"
+      verify_mode         => "verify_peer"
     }
     value_serializer => "org.apache.kafka.common.serialization.ByteArraySerializer"
-    client_key          => "./client.key"
-    client_certificate  => "./client.crt"
-    ca_certificate      => "./ca.pem"
-    verify_mode         => "verify_peer"
   }
 }
 ```

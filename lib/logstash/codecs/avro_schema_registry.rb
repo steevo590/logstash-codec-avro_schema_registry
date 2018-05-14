@@ -51,6 +51,11 @@ MAGIC_BYTE = 0
 # - ``register_schema`` - will register the JSON schema if it does not exist.
 # - ``binary_encoded`` - will output the encoded event as a ByteArray.
 #   Requires the ``ByteArraySerializer`` to be set in the Kafka output config.
+# - ``client_certificate`` -  Client TLS certificate for mutual TLS
+# - ``client_key`` -  Client TLS key for mutual TLS
+# - ``ca_certificate`` -  CA Certificate
+# - ``verify_mode`` -  SSL Verify modes.  Valid options are `verify_none`, `verify_peer`, `verify_client_once`,
+#   and `verify_fail_if_no_peer_cert`.  Default is `verify_peer`
 #
 # ==== Usage
 # Example usage with Kafka input and output.
@@ -78,11 +83,12 @@ MAGIC_BYTE = 0
 #       schema_uri => "/app/my_kafka_subject.avsc"
 #       register_schema => true
 #     }
+#     value_serializer => "org.apache.kafka.common.serialization.ByteArraySerializer"
 #   }
 # }
 # ----------------------------------
 #
-# Binary encoded Kafka output
+# Using signed certificate for registry authentication
 #
 # [source,ruby]
 # ----------------------------------
@@ -92,7 +98,10 @@ MAGIC_BYTE = 0
 #     codec => avro_schema_registry {
 #       endpoint => "http://schemas.example.com"
 #       schema_id => 47
-#       binary_encoded => true
+#       client_key          => "./client.key"
+#       client_certificate  => "./client.crt"
+#       ca_certificate      => "./ca.pem"
+#       verify_mode         => "verify_peer"
 #     }
 #     value_serializer => "org.apache.kafka.common.serialization.ByteArraySerializer"
 #   }
@@ -116,7 +125,7 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
   config :schema_string, :validate => :string, :default => nil
   config :check_compatibility, :validate => :boolean, :default => false
   config :register_schema, :validate => :boolean, :default => false
-  config :binary_encoded, :validate => :boolean, :default => false
+  config :binary_encoded, :validate => :boolean, :default => true
 
   config :client_certificate, :validate => :string, :default => nil
   config :client_key, :validate => :string, :default => nil
