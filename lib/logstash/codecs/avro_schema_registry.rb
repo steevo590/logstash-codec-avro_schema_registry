@@ -29,6 +29,7 @@ MAGIC_BYTE = 0
 # - ``endpoint`` - always required.
 # - ``username`` - optional.
 # - ``password`` - optional.
+# - ``tag_on_failure`` - tag events with ``_avroparsefailure`` when decode fails
 #
 # If the input stream is binary encoded, you should use the ``ByteArrayDeserializer``
 # in the Kafka input config.
@@ -127,6 +128,9 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
   config :register_schema, :validate => :boolean, :default => false
   config :binary_encoded, :validate => :boolean, :default => true
 
+  # tag events with `_avroparsefailure` when decode fails
+  config :tag_on_failure, :validate => :boolean, :default => false
+
   config :client_certificate, :validate => :string, :default => nil
   config :client_key, :validate => :string, :default => nil
   config :ca_certificate, :validate => :string, :default => nil
@@ -134,7 +138,6 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
   
   public
   def register
-
     @client = if client_certificate != nil
       SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(
         client_certificate: client_certificate,
@@ -200,10 +203,16 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
 
           schema = subject.verify_schema(schema_json)
         end
-
+        # Return schema id
         schema.id
       end
     end
+  end
+
+  def clean_event(event)
+    event_hash = event.to_hash
+    event_hash.delete_if { |key, _| EXCLUDE_ALWAYS.include? key }
+    event_hash
   end
 
   public
@@ -222,6 +231,13 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
         yield LogStash::Event.new(datum_reader.read(decoder))
       end
     end
+  rescue => e
+    if tag_on_failure
+      @logger.error("Avro parse error, original data now in message field", :error => e)
+      yield LogStash::Event.new("message" => data, "tags" => ["_avroparsefailure"])
+    else
+      raise e
+    end
   end
 
   public
@@ -233,9 +249,7 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
     buffer.write(MAGIC_BYTE.chr)
     buffer.write([@write_schema_id].pack("I>"))
     encoder = Avro::IO::BinaryEncoder.new(buffer)
-    eh = event.to_hash
-    eh.delete_if { |key, _| EXCLUDE_ALWAYS.include? key }
-    dw.write(eh, encoder)
+    dw.write(clean_event(event), encoder)
     if @binary_encoded
        @on_event.call(event, buffer.string.to_java_bytes)
     else
