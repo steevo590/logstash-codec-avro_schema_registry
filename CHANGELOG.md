@@ -1,3 +1,6 @@
+## 1.1.1
+ - Add tag_on_failure for decode
+
 ## 1.1.0
  - Add support for client side TLS auth to schema registry
 

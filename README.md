@@ -1,6 +1,6 @@
 # Logstash Codec - Avro Schema Registry
 
-### v1.1.0
+### v1.1.1
 
 This plugin is used to serialize Logstash events as
 Avro datums, as well as deserializing Avro datums into
