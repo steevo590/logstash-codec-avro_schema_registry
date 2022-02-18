@@ -2,6 +2,7 @@
 require "avro"
 require "avro-patches"
 require "avro_patches/logical_types/decode_date_as_time_patch"
+require "avro_patches/decode_salsify_uuid_binary_patch"
 require "open-uri"
 require "schema_registry"
 require "schema_registry/client"

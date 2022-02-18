@@ -1,0 +1,16 @@
+{
+    "type": "record",
+    "name": "record_with_salsify_uuid",
+    "namespace": "com.salsify",
+    "fields": [
+        {
+            "name": "id",
+            "type": {
+                "name": "salsify_uuid",
+                "type": "fixed",
+                "namespace": "com.salsify",
+                "size": 38
+            }
+        }
+    ]
+}

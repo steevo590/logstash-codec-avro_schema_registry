@@ -1,3 +1,6 @@
+## 1.2.0
+ - Decode `salsify_uuid_binary` values in canonical UUID text format.
+
 ## 1.1.1
  - Add tag_on_failure for decode
 
