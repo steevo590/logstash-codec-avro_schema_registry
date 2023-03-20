@@ -151,13 +151,14 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
         ca_certificate: ca_certificate,
         verify_mode: verify_mode
       ))
-    elsif registry_ssl == true & ca_certificate != nil
-      SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(
-        ca_certificate: ca_certificate,
-        verify_mode: verify_mode
-      ))
+    #elsif registry_ssl == true & ca_certificate != nil
+    #  SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(
+    #    ca_certificate: ca_certificate,
+    #    verify_mode: verify_mode
+    #  ))
     else
-      SchemaRegistry::Client.new(endpoint, username, password)
+      #SchemaRegistry::Client.new(endpoint, username, password)
+      SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(verify_mode: 'verify_none'))
     end
 
     @schemas = Hash.new
