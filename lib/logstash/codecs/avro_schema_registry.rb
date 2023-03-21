@@ -139,7 +139,7 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
   config :client_certificate, :validate => :string, :default => nil
   config :client_key, :validate => :string, :default => nil
   config :ca_certificate, :validate => :string, :default => nil
-  config :verify_mode, :validate => :string, :default => 'verify_none'
+  config :verify_mode, :validate => :string, :default => 'verify_peer'
   config :registry_ssl, :validate => :boolean, :default => false
   
   public
@@ -151,11 +151,11 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
         ca_certificate: ca_certificate,
         verify_mode: verify_mode
       ))
-    #elsif registry_ssl == true & ca_certificate != nil
-    #  SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(
-    #    ca_certificate: ca_certificate,
-    #    verify_mode: verify_mode
-    #  ))
+    elsif registry_ssl == true & ca_certificate != nil
+      SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(
+        ca_certificate: ca_certificate,
+        verify_mode: verify_mode
+      ))
     else
       #SchemaRegistry::Client.new(endpoint, username, password)
       SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(verify_mode: 'verify_none'))
