@@ -1,6 +1,6 @@
 # Logstash Codec - Avro Schema Registry
 
-### v1.1.1
+### v1.2.2
 
 This plugin is used to serialize Logstash events as
 Avro datums, as well as deserializing Avro datums into
@@ -20,6 +20,8 @@ logstash-plugin install logstash-codec-avro_schema_registry
 
 When this codec is used to decode the input, you may pass the following options:
 - ``endpoint`` - always required.
+- ``registry_ssl`` - optional (default false).
+- ``ca_certificate`` - only with registry_ssl.
 - ``username`` - optional.
 - ``password`` - optional.
 - ``tag_on_failure`` - tag events with ``_avroparsefailure`` when decode fails
@@ -49,6 +51,7 @@ When this codec is used to encode, you may pass the following options:
 - ``client_certificate`` -  Client TLS certificate for mutual TLS
 - ``client_key`` -  Client TLS key for mutual TLS
 - ``ca_certificate`` -  CA Certificate
+- ``registry_ssl`` - default ``false`` set ``true`` to specify ``ca_certificate`` for input ssl trust ca file
 - ``verify_mode`` -  SSL Verify modes.  Valid options are `verify_none`, `verify_peer`,  `verify_client_once` , and `verify_fail_if_no_peer_cert`.  Default is `verify_peer`
 
   
