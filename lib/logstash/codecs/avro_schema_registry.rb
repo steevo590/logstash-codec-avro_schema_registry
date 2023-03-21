@@ -30,6 +30,8 @@ MAGIC_BYTE = 0
 #
 # When this codec is used to decode the input, you may pass the following options:
 # - ``endpoint`` - always required.
+# - ``registry_ssl`` - optional (default false).
+# - ``ca_certificate`` - only with registry_ssl.
 # - ``username`` - optional.
 # - ``password`` - optional.
 # - ``tag_on_failure`` - tag events with ``_avroparsefailure`` when decode fails
@@ -156,9 +158,10 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
         ca_certificate: ca_certificate,
         verify_mode: verify_mode
       ))
+    elsif registry_ssl == true
+      SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(verify_mode: verify_mode))
     else
-      #SchemaRegistry::Client.new(endpoint, username, password)
-      SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(verify_mode: 'verify_none'))
+      SchemaRegistry::Client.new(endpoint, username, password)      
     end
 
     @schemas = Hash.new
