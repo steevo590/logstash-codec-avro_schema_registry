@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "avro"  #(Apache 2.0 license)
   s.add_runtime_dependency "avro-patches", ">= 0.3"
   s.add_runtime_dependency "schema_registry", ">= 0.1.0" #(MIT license)
+  s.add_runtime_dependency "sinatra", "~> 2.1.0"
   s.add_development_dependency "logstash-devutils"
   s.add_development_dependency "avro_turf"
   s.add_development_dependency "webmock"
