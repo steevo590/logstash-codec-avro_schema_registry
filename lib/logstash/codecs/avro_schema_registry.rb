@@ -147,19 +147,19 @@ class LogStash::Codecs::AvroSchemaRegistry < LogStash::Codecs::Base
   public
   def register
     @client = if client_certificate != nil
-      SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(
+      SchemaRegistry::Client.new(endpoint, username, password, **SchemaRegistry::Client.connection_options(
         client_certificate: client_certificate,
         client_key: client_key,
         ca_certificate: ca_certificate,
         verify_mode: verify_mode
       ))
     elsif registry_ssl == true && ca_certificate != nil
-      SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(
+      SchemaRegistry::Client.new(endpoint, username, password, **SchemaRegistry::Client.connection_options(
         ca_certificate: ca_certificate,
         verify_mode: verify_mode
       ))
     elsif registry_ssl == true
-      SchemaRegistry::Client.new(endpoint, username, password, SchemaRegistry::Client.connection_options(verify_mode: verify_mode))
+      SchemaRegistry::Client.new(endpoint, username, password, **SchemaRegistry::Client.connection_options(verify_mode: verify_mode))
     else
       SchemaRegistry::Client.new(endpoint, username, password)      
     end
